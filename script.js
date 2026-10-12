@@ -44,7 +44,7 @@
         // Typewriter effect
         function typewriterEffect() {
             const typewriterElement = document.getElementById('typewriter');
-            const texts = ['future AI engineer', 'computer science student'];
+            const texts = ['an AI Research Engineer', 'a deep learning enthusiast'];
             let textIndex = 0;
             let charIndex = 0;
             let isDeleting = false;
@@ -75,6 +75,7 @@
         }
 
         // Copy email function
+        let copyTimeout;
         function copyEmail() {
             const email = 'nahilelbezzari@gmail.com';
             if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -86,18 +87,50 @@
             function fallbackCopy() {
                 const textArea = document.createElement("textarea");
                 textArea.value = email;
+                textArea.style.position = "fixed";
+                textArea.style.top = "-9999px";
+                textArea.style.left = "-9999px";
                 document.body.appendChild(textArea);
+                textArea.focus();
                 textArea.select();
-                document.execCommand('copy');
+                try {
+                    document.execCommand('copy');
+                    showCopyMessage();
+                } catch (err) {
+                    console.error('Fallback copy failed', err);
+                }
                 document.body.removeChild(textArea);
-                showCopyMessage();
             }
         }
 
         function showCopyMessage() {
             const message = document.getElementById('copyMessage');
+            if (!message) return;
             message.classList.add('show');
-            setTimeout(function() { message.classList.remove('show'); }, 2000);
+            clearTimeout(copyTimeout);
+            copyTimeout = setTimeout(function() {
+                message.classList.remove('show');
+            }, 2500);
+        }
+
+        // Interactive Before / After Comparison Slider
+        function initComparisonSliders() {
+            const sliders = document.querySelectorAll('.comparison-slider');
+            sliders.forEach(slider => {
+                const range = slider.querySelector('.slider-range');
+                if (!range) return;
+
+                const updatePosition = (val) => {
+                    slider.style.setProperty('--slider-pos', `${val}%`);
+                };
+
+                range.addEventListener('input', (e) => {
+                    updatePosition(e.target.value);
+                });
+
+                // Initialize to 50% or current value
+                updatePosition(range.value || 50);
+            });
         }
 
         // Initialize everything when page loads
@@ -106,6 +139,7 @@
             fadeInOnScroll(); // Initial check
             typewriterEffect(); // Start typewriter effect
             createParticles(); // create floating particles
+            initComparisonSliders(); // Initialize comparison slider
             // Show first section immediately
             const hero = document.querySelector('.hero-content');
             if (hero) hero.classList.add('visible');
